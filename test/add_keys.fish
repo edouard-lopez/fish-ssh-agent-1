@@ -19,15 +19,12 @@ test "$TEST - Fail if `keys` list is empty"
     ) = 1
 end
 
-
 test "$TEST - Add given keys"
     (
-		ssh-agent /usr/bin/fish
-    	set old_keys_list (ssh-add -l | wc -l)
-		ssh-keygen -f $path/.test -N '' >/dev/null
-		__add_keys $path/.test.pub
-        set new_keys_list (ssh-add -l | wc -l)
-    	
-		math $new_key_list - $old_keys_list
-    ) = 1
+		  eval (ssh-agent -c) > /dev/null
+      ssh-add -l
+    	ssh-keygen -f $path/.test -N "" > /dev/null
+      __add_keys $path/.test.pub > /dev/null
+      ssh-add -L | awk -F' ' '{print $2}'
+    ) = "The agent has no identities."  (cat $path/.test.pub| awk -F ' ' '{print $2}')
 end
