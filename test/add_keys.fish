@@ -31,3 +31,14 @@ test "$TEST - Add a given key"
       math "$new_keys_list - $old_keys_list"
     ) = 1
 end
+
+test "$TEST - Add a given key (with mock)"
+  (
+      eval (ssh-agent -c) > /dev/null
+      ssh-keygen -f $path/.test -N '' >/dev/null
+
+      mock ssd-add 0 "Identity added: /.test"
+      __add_keys $path/.test.pub
+      grep --count "Identity added: /.test" /tmp/ssh-add.err
+    ) = 1
+end
